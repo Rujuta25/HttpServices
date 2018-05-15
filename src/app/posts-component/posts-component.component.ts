@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Http } from '@angular/http';
+import { PostService } from '../services/post.service';
 
 @Component({
   selector: 'posts-component',
@@ -9,39 +10,51 @@ import { Http } from '@angular/http';
 export class PostsComponentComponent implements OnInit {
 //posts is a field
   posts : any[];
-  private url = "http://jsonplaceholder.typicode.com/posts";
   
-  constructor(private http : Http) { 
-    this.http.get(this.url)
-      .subscribe(response => {
-        this.posts =  response.json();
-      });  
+  
+  constructor(private service : PostService) { 
+    
   }
 
   createPost(input : HTMLInputElement){
     let post : any = {title: input.value}
     input.value = '';
-    this.http.post(this.url, JSON.stringify(post))
+    this.service.createPost(post)
     this.posts.splice(0,0,post);
   }
 
   updatePost(post){
-    this.http.patch(this.url, JSON.stringify({isRead : true}))
-    this.http.put(this.url, JSON.stringify(post))
+    this.service.updatePost(post)
     .subscribe(response =>{
       console.log(response);
+    }, 
+    error => {
+      alert('Received unexpected error');
+      console.log(error);
     })
   }
 
   deletePost(post){
     
-    this.http.delete(this.url + '/' + post.id)
+   this.service.deletePost(post.id)
     .subscribe(response =>{
       let index = this.posts.indexOf(post);
       this.posts.splice(index,1);
+    }, 
+    error => {
+      alert('Received unexpected error');
+      console.log(error);
     })
   }
   ngOnInit() {
+   this.service.getPost()
+    .subscribe(response => {
+      this.posts =  response.json();
+    }, 
+    error => {
+       alert('Received unexpected error');
+       console.log(error);
+    });  
   }
 
 }
