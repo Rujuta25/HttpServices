@@ -19,9 +19,13 @@ export class PostsComponentComponent implements OnInit {
   createPost(input : HTMLInputElement){
     let post : any = {title: input.value}
     input.value = '';
+    
     this.service.createPost(post)
     this.posts.splice(0,0,post);
   }
+    
+  
+
 
   updatePost(post){
     this.service.updatePost(post)
@@ -41,9 +45,15 @@ export class PostsComponentComponent implements OnInit {
       let index = this.posts.indexOf(post);
       this.posts.splice(index,1);
     }, 
-    error => {
-      alert('Received unexpected error');
-      console.log(error);
+    (error: Response)=> {
+      if (error.status === 404)
+        //this.form.setErrors(error.json());  
+        alert('This post is already been detected');
+      else{ 
+        alert('Received unexpected error');
+        console.log(error);
+      }; 
+     
     })
   }
   ngOnInit() {

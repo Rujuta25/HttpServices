@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+import { AppError } from '../common/app-error';
+
+
 
 @Injectable()
 export class PostService {
@@ -14,6 +19,11 @@ export class PostService {
     
       createPost(post){    
         return this.http.post(this.url, JSON.stringify(post))
+        .catch((error: Response)=> {
+            if(error.status === 400)
+            
+             return Observable.throw(new AppError());
+        });
       }
 
       updatePost(post){
@@ -21,6 +31,10 @@ export class PostService {
       }
       deletePost(id){
         return this.http.delete(this.url + '/' + id)
+        .catch((error : Response) => {
+          return Observable.throw(new AppError());
+
+        })
       }
 
     }
